@@ -1,0 +1,8 @@
+// Historical nutrition is frozen when a meal is checked, independently of plan edits.
+for(const d of Object.values(state.days)){d.mealSnapshots??={};for(const id of d.meals){const m=state.meals.find(m=>m.id===id);if(m&&!d.mealSnapshots[id])d.mealSnapshots[id]={kcal:m.kcal,protein:m.protein,name:m.name};}}
+eaten=function(){const d=day();return d.meals.reduce((s,id)=>{const m=d.mealSnapshots?.[id]||state.meals.find(m=>m.id===id);return m?{kcal:s.kcal+m.kcal,protein:s.protein+m.protein}:s;},{kcal:0,protein:0});};
+document.addEventListener('click',event=>{const b=event.target.closest('button');if(!b)return;const id=b.dataset.meal;if(id){const d=editDay();d.mealSnapshots??={};if(d.meals.includes(id)){const m=state.meals.find(m=>m.id===id);d.mealSnapshots[id]={name:m.name,kcal:m.kcal,protein:m.protein};}else delete d.mealSnapshots[id];save();render();}if(b.dataset.v2==='legacy-backup'){const raw=localStorage.getItem(KEY+':backup-before-v2');if(raw)download(raw,'application/json','rotina-vida-antes-v2.json');else toast('Ainda não existe uma cópia anterior neste navegador.');}});
+const baseSettings2=settings2;settings2=function(){baseSettings2();document.getElementById('fields').insertAdjacentHTML('beforeend','<button type="button" class="text-button" data-v2="legacy-backup">Exportar cópia anterior à migração ↗</button>');};
+// Keep cash exclusively in accounts; properties stay in the asset ledger.
+const baseAssetEditor=editAsset;editAsset=function(id){baseAssetEditor(id);const sel=document.getElementById('f-category');if(sel){for(const option of [...sel.options])if(option.value==='Poupanças')option.remove();}};
+render();
